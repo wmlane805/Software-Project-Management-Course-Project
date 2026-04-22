@@ -1,83 +1,76 @@
 package com.example.projectmanager.controllers;
-
-import com.example.projectmanager.model.*;
-import com.example.projectmanager.model.ProjectManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
+import com.example.projectmanager.database.DatabaseManager;
 
 @Controller
 public class ProjectController {
 
-    private List<ProjectManager> projects = new ArrayList<>();
+    private final DatabaseManager db;
 
-    public ProjectController() {
-        // Mock data
-        ProjectManager p = new ProjectManager(1L, "Demo Project", "Jay");
-        p.getMembers().addAll(List.of("Alice", "Bob"));
-
-        p.getFunctionalRequirements().add("Login System");
-        p.getNonFunctionalRequirements().add("Fast Performance");
-
-        p.getRisks().add("Tight deadline");
-
-        p.getEfforts().add(new Effort("Login System"));
-
-        projects.add(p);
+    public ProjectController(DatabaseManager db) {
+        this.db = db;
     }
+
 
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute("projects", projects);
-        model.addAttribute("selectedProject", null);
+        model.addAttribute("projects", db.getAllProjects());
         return "home";
     }
 
     @GetMapping("/project/{id}")
     public String selectProject(@PathVariable Long id, Model model) {
-        ProjectManager p = projects.stream()
-                .filter(x -> x.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-
-        model.addAttribute("projects", projects);
-        model.addAttribute("selectedProject", p);
+        model.addAttribute("projects", db.getAllProjects());
+        model.addAttribute("selectedProject", db.getProjectById(id));
+        model.addAttribute("projectId", id);
         return "home";
     }
 
     @PostMapping("/project/create")
     public String createProject(@RequestParam String name,
                                 @RequestParam String owner,
-                                @RequestParam String members) {
-
-        ProjectManager p = new ProjectManager(System.currentTimeMillis(), name, owner);
-        p.setMembers(Arrays.asList(members.split(",")));
-        projects.add(p);
-
+                                @RequestParam String description) {
+        db.createProject(name, description, owner);
         return "redirect:/";
     }
 
     @GetMapping("/requirements/{id}")
     public String requirements(@PathVariable Long id, Model model) {
-        model.addAttribute("project", find(id));
-        return "requirements";
+        model.addAttribute("requirements", db.retrieveRequirements(id));
+        model.addAttribute("projectId", id);
+        return "requirementspage";
     }
 
     @GetMapping("/risks/{id}")
     public String risks(@PathVariable Long id, Model model) {
-        model.addAttribute("project", find(id));
+        model.addAttribute("risks", db.retrieveRisks(id));
+        model.addAttribute("projectId", id);
         return "risks";
     }
 
     @GetMapping("/effort/{id}")
     public String effort(@PathVariable Long id, Model model) {
-        model.addAttribute("project", find(id));
-        return "effort";
+        model.addAttribute("efforts", db.pullEffortLogs(id));
+        model.addAttribute("projectId", id);
+        return "efforttrackingpage";
     }
 
-    private ProjectManager find(Long id) {
-        return projects.stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
+    @GetMapping("/dashboard")
+    public String dashboard() {
+        return "redirect:/";
+    }
+
+    @GetMapping("/summary/{id}")
+    public String summary(@PathVariable Long id, Model model) {
+        model.addAttribute("projectId", id);
+        return "projectsummarypage";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteProject(@PathVariable Long id) {
+        db.deleteProject(id);
+        return "redirect:/";
     }
 }

@@ -1,18 +1,33 @@
-CREATE TABLE projects (
+CREATE TABLE IF NOT EXISTS projects (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "owner" TEXT NOT NULL,
     "is_completed" BOOLEAN DEFAULT 0
 );
 
-CREATE TABLE team_members (
+CREATE TABLE IF NOT EXISTS project (
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "project_id" INTEGER NOT NULL,
+    "requirement_id" INTEGER,
+    "member_id" INTEGER,
+    "risk_id" INTEGER,
+    "effort_id" INTEGER,
+    FOREIGN KEY ("project_id") REFERENCES projects("id"),
+    FOREIGN KEY ("requirement_id") REFERENCES requirements("id"),
+    FOREIGN KEY ("member_id") REFERENCES team_members("member_id"),
+    FOREIGN KEY ("risk_id") REFERENCES risks("id"),
+    FOREIGN KEY ("effort_id") REFERENCES effort_logs("id")
+    );
+
+CREATE TABLE IF NOT EXISTS team_members (
     "member_id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "project_id" INTEGER,
     "name" TEXT NOT NULL,
     FOREIGN KEY (project_id) REFERENCES projects("id")
 );
 
-CREATE TABLE requirements (
+CREATE TABLE IF NOT EXISTS requirements (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "project_id" INTEGER,
     "type" TEXT CHECK(type IN ('functional', 'non-functional')),
@@ -20,14 +35,14 @@ CREATE TABLE requirements (
     FOREIGN KEY("project_id") REFERENCES projects("id")
 );
 
-CREATE TABLE risks (
+CREATE TABLE IF NOT EXISTS risks (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "project_id" INTEGER,
     "description" TEXT NOT NULL,
     FOREIGN KEY("project_id") REFERENCES projects("id")
 );
 
-CREATE TABLE effort_logs (
+CREATE TABLE IF NOT EXISTS effort_logs (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "requirement_id" INTEGER,
     "phase" TEXT CHECK(phase IN ('analysis', 'design', 'coding', 'testing', 'management')),
@@ -35,12 +50,3 @@ CREATE TABLE effort_logs (
     "member_name" TEXT,
     FOREIGN KEY("requirement_id") REFERENCES requirements("id")
 );
-
-SELECT
-    r.id AS requirement_id,
-    r.description,
-    SUM(e.hours) AS total_hours
-FROM requirements r
-LEFT JOIN effort_logs e
-    ON r.id = e.requirement_id
-GROUP BY r.id, r.description;
