@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div class="top-nav">
+    <a th:href="@{/}">Home</a>
+</div>
+
+<div class="container">
+
+    <div class="sidebar">
+        <h3>Projects +</h3>
+        <ul>
+            <li th:each="p : ${projects}">
+                <a th:href="@{'/project/' + ${p.id}}" th:text="${p.name}"></a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main">
+        <h1 th:text="${selectedProject != null ? selectedProject.name : 'No Project'}"></h1>
+        <p th:text="${selectedProject != null ? selectedProject.owner : ''}"></p>
+
+        <a th:if="${selectedProject != null}" th:href="@{'/requirements/' + ${selectedProject.id}}">Requirements</a>
+        <a th:if="${selectedProject != null}" th:href="@{'/risks/' + ${selectedProject.id}}">Risks</a>
+        <a th:if="${selectedProject != null}" th:href="@{'/effort/' + ${selectedProject.id}}">Effort</a>
+    </div>
+
+</div>
+
+<form action="/project/create" method="post">
+    <input name="name" placeholder="Project Name">
+    <input name="owner" placeholder="Owner">
+    <input name="members" placeholder="Members">
+    <button>Create</button>
+</form>
+
+</body>
+</html>

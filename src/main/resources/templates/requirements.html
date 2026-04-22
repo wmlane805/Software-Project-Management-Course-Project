@@ -1,0 +1,11 @@
+<h2>Requirements</h2>
+
+<h3>Functional</h3>
+<ul>
+    <li th:each="r : ${project.functionalRequirements}" th:text="${r}"></li>
+</ul>
+
+<h3>Non-Functional</h3>
+<ul>
+    <li th:each="r : ${project.nonFunctionalRequirements}" th:text="${r}"></li>
+</ul>

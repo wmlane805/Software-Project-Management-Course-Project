@@ -1,0 +1,22 @@
+<h2>Effort Tracking</h2>
+
+<table border="1">
+    <tr>
+        <th>Requirement</th>
+        <th>Analysis</th>
+        <th>Design</th>
+        <th>Coding</th>
+        <th>Testing</th>
+        <th>PM</th>
+    </tr>
+
+    <tr th:each="e : ${project.efforts}">
+        <td th:text="${e.requirement}"></td>
+        <td><input type="number" th:value="${e.analysis}"></td>
+        <td><input type="number" th:value="${e.design}"></td>
+        <td><input type="number" th:value="${e.coding}"></td>
+        <td><input type="number" th:value="${e.testing}"></td>
+        <td><input type="number" th:value="${e.management}"></td>
+    </tr>
+
+</table>
