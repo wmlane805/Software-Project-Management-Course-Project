@@ -5,34 +5,38 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 
-<body>
+<body class="requirements">
 
 <div th:replace="~{navbar :: navbar}"></div>
 
-
-<div class="container">
+<div class="requirements-container">
     <h2>Requirements</h2>
 
-    <input type="text" name="requirement" placeholder="Enter requirement">
+    <table class="requirements-table" th:if="${not #lists.isEmpty(requirements)}">
+        <tr th:each="r : ${requirements}">
+            <td th:text="${r['description']}"></td>
+            <td th:text="${r['type']}"></td>
+            <td class="requirements-action">
+                <input type="checkbox" th:checked="${r['is_completed']}"
+                       th:onclick="|window.location.href='/requirements/complete/' + ${r['id']} + '/' + ${projectId}|">
+            </td>
+            <td class="requirements-action">
+                <button th:onclick="|window.location.href='/requirements/delete/' + ${r['id']} + '/' + ${projectId}|">X</button>
+            </td>
+        </tr>
+    </table>
 
-    <select name="type">
-        <option value="functional">Functional</option>
-        <option value="nonfunctional">Non-Functional</option>
-    </select>
+    <p th:if="${#lists.isEmpty(requirements)}">No Requirements</p>
 
-    <button>Add Requirement</button>
-
-    <ul>
-        <li>Requirement 1</li>
-        <li>Requirement 2</li>
-    </ul>
+    <form th:action="@{'/requirements/add/' + ${projectId}}" method="post" class="requirements-form">
+        <textarea name="description" placeholder="Enter requirement" rows="2"></textarea>
+        <select name="type">
+            <option value="functional">Functional</option>
+            <option value="non-functional">Non-Functional</option>
+        </select>
+        <button type="submit">Add Requirement</button>
+    </form>
 </div>
-
-<script>
-    function goTo(page){
-        window.location.href = "/" + page;
-    }
-</script>
 
 </body>
 </html>

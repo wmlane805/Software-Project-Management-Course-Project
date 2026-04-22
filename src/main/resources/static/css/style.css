@@ -58,6 +58,7 @@ body.summary {}
     justify-content: space-around;
     align-items: center;
     height: 70vh;
+    color: white;
 }
 
 .box {
@@ -129,10 +130,145 @@ button.submit {
     height: 70vh;
 }
 
+
 /*   Requirements   */
+.requirements-container {
+    padding: 30px;
+    color: white;
+}
+
+.requirements-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.requirements-table td {
+    padding: 10px;
+    border-bottom: 1px solid #444;
+}
+
+.requirements-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.requirements-form textarea {
+    width: 100%;
+    resize: vertical;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.requirements-form select {
+    margin-bottom: 10px;
+    padding: 8px;
+}
+
+.requirements-form button {
+    width: fit-content;
+    padding: 8px 20px;
+    background-color: #ccc;
+    border: none;
+    cursor: pointer;
+}
+
+.requirements-action {
+    width: 40px;
+    text-align: center;
+}
+
+/*   Risks   */
+.risks-container {
+    padding: 30px;
+    color: white;
+}
+
+.risks-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.risks-table td {
+    padding: 10px;
+    border-bottom: 1px solid #444;
+}
+
+.risks-table td:first-child {
+    width: 150px;
+}
+
+.risks-action {
+    width: 40px;
+    text-align: center;
+}
+
+.risks-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.risks-form input, .risks-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    resize: vertical;
+}
+
+.risks-form button {
+    width: fit-content;
+    padding: 8px 20px;
+    background-color: #ccc;
+    border: none;
+    cursor: pointer;
+}
 
 
 /*   Effort Tracking   */
+.effort-container {
+    padding: 30px;
+    color: white;
+}
 
+.effort-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.effort-table th, .effort-table td {
+    padding: 10px;
+    border: 1px solid #444;
+    text-align: center;
+}
+
+.effort-table th {
+    background-color: #1f1f1f;
+}
+
+.effort-table td div {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+}
+
+.effort-table input[type="number"] {
+    width: 50px !important;
+    padding: 4px;
+}
 
 /*   Summary   */
+.summary-container {
+    padding: 30px;
+    color: white;
+}

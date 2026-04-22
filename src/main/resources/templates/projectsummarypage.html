@@ -3,26 +3,27 @@
 <head>
     <title>Summary</title>
     <link rel="stylesheet" href="/css/style.css">
-
 </head>
 
 <body class="summary">
 
 <div th:replace="~{navbar :: navbar}"></div>
 
+<div class="summary-container">
+    <h2 th:text="${project['name']} + ' Summary'"></h2>
 
-<h2>Project Summary</h2>
+    <p>Total Analysis Hours: <span th:text="${#numbers.formatDecimal(totals['analysis'], 1, 0)}"></span></p>
+    <p>Total Design Hours: <span th:text="${#numbers.formatDecimal(totals['design'], 1, 0)}"></span></p>
+    <p>Total Coding Hours: <span th:text="${#numbers.formatDecimal(totals['coding'], 1, 0)}"></span></p>
+    <p>Total Testing Hours: <span th:text="${#numbers.formatDecimal(totals['testing'], 1, 0)}"></span></p>
+    <p>Total Management Hours: <span th:text="${#numbers.formatDecimal(totals['management'], 1, 0)}"></span></p>
 
-<p>Total Analysis Hours: 0</p>
-<p>Total Design Hours: 0</p>
-<p>Total Coding Hours: 0</p>
-<p>Total Testing Hours: 0</p>
-<p>Total Management Hours: 0</p>
-
-<label>
-    <input type="checkbox" name="complete">
-    Project Complete
-</label>
+    <label>
+        <input type="checkbox" th:checked="${project['is_completed']}"
+               th:onclick="|window.location.href='/project/complete/' + ${projectId}|">
+        Project Complete
+    </label>
+</div>
 
 </body>
 </html>

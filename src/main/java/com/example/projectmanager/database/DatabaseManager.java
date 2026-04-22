@@ -64,9 +64,9 @@ public class DatabaseManager {
         jdbc.update(sql, requirementId);
     }
 
-    public void newRisk(Long projectId, String description) {
-        String sql = "INSERT INTO risks (project_id, description) VALUES (?, ?)";
-        jdbc.update(sql, projectId, description);
+    public void newRisk(Long projectId, String title, String description) {
+        String sql = "INSERT INTO risks (project_id, title, description) VALUES (?, ?, ?)";
+        jdbc.update(sql, projectId, title, description);
     }
 
     public List<Map<String, Object>> retrieveRisks(Long projectId) {
@@ -80,17 +80,17 @@ public class DatabaseManager {
     }
 
     public void newEffortLog(Long requirementId, String phase, double hours, String memberName) {
-        String sql = "INSERT INTO effort_logs (requirement_id, phase, hours, member_name) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO effort (requirement_id, phase, hours, member_name) VALUES (?, ?, ?, ?)";
         jdbc.update(sql, requirementId, phase, hours, memberName);
     }
 
     public List<Map<String, Object>> retrieveEffortLogs(Long requirementId) {
-        String sql = "SELECT * FROM effort_logs WHERE requirement_id = ?";
+        String sql = "SELECT * FROM effort WHERE requirement_id = ?";
         return jdbc.queryForList(sql, requirementId);
     }
 
     public void deleteEffortLog(Long effortId) {
-        String sql = "DELETE FROM effort_logs WHERE id = ?";
+        String sql = "DELETE FROM effort WHERE id = ?";
         jdbc.update(sql, effortId);
     }
 
@@ -111,10 +111,38 @@ public class DatabaseManager {
 
     public List<Map<String, Object>> pullEffortLogs(Long projectId) {
         String sql = "SELECT e.*, r.description as requirement_description " +
-                "FROM effort_logs e " +
+                "FROM effort e " +
                 "JOIN requirements r ON e.requirement_id = r.id " +
                 "WHERE r.project_id = ?";
         return jdbc.queryForList(sql, projectId);
+    }
+
+    public void completeRequirement(Long requirementId) {
+        String sql = "UPDATE requirements SET is_completed = CASE WHEN is_completed = 1 THEN 0 ELSE 1 END WHERE id = ?";
+        jdbc.update(sql, requirementId);
+    }
+
+    public void updateEffort(Long effortId, double hours) {
+        String sql = "UPDATE effort SET hours = ? WHERE id = ?";
+        jdbc.update(sql, hours, effortId);
+    }
+
+    public Map<String, Object> totalHours(Long projectId) {
+        String sql = "SELECT " +
+                "SUM(CASE WHEN e.phase = 'analysis' THEN e.hours ELSE 0 END) as analysis, " +
+                "SUM(CASE WHEN e.phase = 'design' THEN e.hours ELSE 0 END) as design, " +
+                "SUM(CASE WHEN e.phase = 'coding' THEN e.hours ELSE 0 END) as coding, " +
+                "SUM(CASE WHEN e.phase = 'testing' THEN e.hours ELSE 0 END) as testing, " +
+                "SUM(CASE WHEN e.phase = 'management' THEN e.hours ELSE 0 END) as management " +
+                "FROM effort e " +
+                "JOIN requirements r ON e.requirement_id = r.id " +
+                "WHERE r.project_id = ?";
+        return jdbc.queryForMap(sql, projectId);
+    }
+
+    public void UpdateProjectStatus(Long projectId) {
+        String sql = "UPDATE projects SET is_completed = CASE WHEN is_completed = 1 THEN 0 ELSE 1 END WHERE id = ?";
+        jdbc.update(sql, projectId);
     }
 
 }

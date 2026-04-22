@@ -3,6 +3,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.example.projectmanager.database.DatabaseManager;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 
 @Controller
 public class ProjectController {
@@ -52,7 +57,23 @@ public class ProjectController {
 
     @GetMapping("/effort/{id}")
     public String effort(@PathVariable Long id, Model model) {
-        model.addAttribute("efforts", db.pullEffortLogs(id));
+        List<Map<String, Object>> efforts = db.pullEffortLogs(id);
+
+        Map<String, Map<String, List<Map<String, Object>>>> grouped = new LinkedHashMap<>();
+
+        for (Map<String, Object> e : efforts) {
+            String req = (String) e.get("requirement_description");
+            String phase = (String) e.get("phase");
+
+            grouped.computeIfAbsent(req, k -> new LinkedHashMap<>())
+                    .computeIfAbsent(phase, k -> new ArrayList<>())
+                    .add(e);
+        }
+
+        System.out.println("Efforts size: " + efforts.size());
+        System.out.println("Grouped size: " + grouped.size());
+
+        model.addAttribute("grouped", grouped);
         model.addAttribute("projectId", id);
         return "efforttrackingpage";
     }
@@ -65,6 +86,8 @@ public class ProjectController {
     @GetMapping("/summary/{id}")
     public String summary(@PathVariable Long id, Model model) {
         model.addAttribute("projectId", id);
+        model.addAttribute("totals", db.totalHours(id));
+        model.addAttribute("project", db.getProjectById(id));
         return "projectsummarypage";
     }
 
@@ -73,4 +96,61 @@ public class ProjectController {
         db.deleteProject(id);
         return "redirect:/";
     }
+
+    @PostMapping("/requirements/add/{id}")
+    public String addRequirement(@PathVariable Long id,
+                                 @RequestParam String description,
+                                 @RequestParam String type) {
+        db.addRequirement(id, type, description);
+        return "redirect:/requirements/" + id;
+    }
+
+    @GetMapping("/requirements/delete/{requirementId}/{projectId}")
+    public String deleteRequirement(@PathVariable Long requirementId,
+                                    @PathVariable Long projectId) {
+        db.deleteRequirement(requirementId);
+        return "redirect:/requirements/" + projectId;
+    }
+
+    @GetMapping("/requirements/complete/{requirementId}/{projectId}")
+    public String completedRequirement(@PathVariable Long requirementId,
+                                       @PathVariable Long projectId) {
+        db.completeRequirement(requirementId);
+        return "redirect:/requirements/" + projectId;
+    }
+
+    @PostMapping("/risks/add/{id}")
+    public String addRisk(@PathVariable Long id,
+                          @RequestParam String title,
+                          @RequestParam String description) {
+        db.newRisk(id, title, description);
+        return "redirect:/risks/" + id;
+    }
+
+    @GetMapping("/risks/delete/{riskId}/{projectId}")
+    public String deleteRisk(@PathVariable Long riskId,
+                             @PathVariable Long projectId) {
+        db.deleteRisk(riskId);
+        return "redirect:/risks/" + projectId;
+    }
+
+    @PostMapping("/effort/save/{id}")
+    public String saveEffort(@PathVariable Long id,
+                             @RequestParam Map<String, String> params) {
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            if (entry.getKey().startsWith("effort_")) {
+                Long effortId = Long.parseLong(entry.getKey().replace("effort_", ""));
+                double hours = Double.parseDouble(entry.getValue());
+                db.updateEffort(effortId, hours);
+            }
+        }
+        return "redirect:/effort/" + id;
+    }
+
+    @GetMapping("/project/complete/{id}")
+    public String completeProject(@PathVariable Long id) {
+        db.UpdateProjectStatus(id);
+        return "redirect:/summary/" + id;
+    }
+
 }
